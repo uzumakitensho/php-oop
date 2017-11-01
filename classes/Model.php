@@ -15,18 +15,6 @@ class Model extends Connection
 		$this->getTableColumns();
 	}
 
-	public function get()
-	{
-		$statement = $this->db->query('select * from ' . $this->table);
-		$statement->setFetchMode(PDO::FETCH_CLASS, get_class($this));
-		$result = [];
-		while ($row = $statement->fetchObject()) {
-			$result[] = $row;
-		}
-
-		return $result;
-	}
-
 	protected function getTableColumns()
 	{
 		$statement = $this->db->query('show columns from ' . $this->table);
@@ -47,6 +35,28 @@ class Model extends Connection
 		}
 
 		$this->columns =  $result;
+	}
+
+	public function get()
+	{
+		$result = false;
+
+		try{
+			$statement = $this->db->query('select * from ' . $this->table);
+			$statement->setFetchMode(PDO::FETCH_CLASS, get_class($this));
+			$result = [];
+			while ($row = $statement->fetchObject()) {
+				$result[] = $row;
+			}
+		}catch(PDOException $ex){
+			echo "PDOException: >> ";
+			print_r($ex);
+		}catch(Exception $ex){
+			echo "Exception: >> ";
+			print_r($ex);
+		}
+
+		return $result;
 	}
 
 	public function insert($input_columns = [])
@@ -75,5 +85,85 @@ class Model extends Connection
 		}
 
 		return true;
+	}
+
+	public function update($id = null, $input_columns = [])
+	{
+		if(count($input_columns) == 0)
+			return false;
+
+		if($id == null || !is_numeric($id))
+			return false;
+
+		$columns_query = [];
+		foreach ($input_columns as $field => $value) {
+			$columns_query[$field] = $field . ' = :' . $field;
+		}
+
+		$columns_query = implode(', ', $columns_query);
+		$query = "UPDATE " . $this->table . " SET " . $columns_query;
+		$query .= " WHERE " . $this->primary_key . " = " . $id;
+
+		// return $input_columns;
+
+		try{
+			$stmt = $this->db->prepare($query);
+			$stmt->execute($input_columns);
+			$user = $stmt->fetch();
+		}catch(PDOException $ex){
+			echo "PDOException: >> ";
+			print_r($ex);
+		}catch(Exception $ex){
+			echo "Exception: >> ";
+			print_r($ex);
+		}
+
+		return true;
+	}
+
+	public function delete($id = null)
+	{
+		if($id == null || !is_numeric($id))
+			return false;
+
+		$query = "DELETE FROM " . $this->table . " WHERE " . $this->primary_key . " = " . $id;
+
+		try{
+			$stmt = $this->db->query($query);
+			$user = $stmt->fetch();
+		}catch(PDOException $ex){
+			echo "PDOException: >> ";
+			print_r($ex);
+		}catch(Exception $ex){
+			echo "Exception: >> ";
+			print_r($ex);
+		}
+
+		return true;
+	}
+
+	public function find($id = null)
+	{
+		if($id == null || !is_numeric($id))
+			return false;
+
+		$query = "SELECT * FROM " . $this->table . " WHERE " . $this->primary_key . " = " . $id;
+		$result = false;
+
+		try{
+			$statement = $this->db->query($query);
+			$statement->setFetchMode(PDO::FETCH_CLASS, get_class($this));
+			while ($row = $statement->fetchObject()) {
+				$result = $row;
+			}
+		}catch(PDOException $ex){
+			echo "PDOException: >> ";
+			print_r($ex);
+		}catch(Exception $ex){
+			echo "Exception: >> ";
+			print_r($ex);
+		}
+
+		return $result;
 	}
 }
