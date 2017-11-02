@@ -55,7 +55,7 @@ if(isset($_POST['btn_update'])){
 		<meta name="author" content="">
 		<link rel="icon" href="../../favicon.ico">
 
-		<title>Pelatihan IKITAS</title>
+		<title>Dashboard Template for Bootstrap</title>
 
 		<!-- Bootstrap core CSS -->
 		<link href="bootstrap.min.css" rel="stylesheet">
@@ -88,7 +88,7 @@ if(isset($_POST['btn_update'])){
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="#">SIMPUSTAKA</a>
+					<a class="navbar-brand" href="#">Project name</a>
 				</div>
 				<div id="navbar" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav navbar-right">
